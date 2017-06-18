@@ -116,6 +116,6 @@ public class ListFragment extends Fragment {
     }
 
     public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(Movie item);
+        void onItemClicked(Movie item);
     }
 }

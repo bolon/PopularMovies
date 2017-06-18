@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.nnd.popularmovies.App;
 import com.nnd.popularmovies.R;
 import com.nnd.popularmovies.main.ListFragment.OnListFragmentInteractionListener;
 import com.nnd.popularmovies.main.movies.Movie;
@@ -16,6 +17,7 @@ import com.nnd.popularmovies.main.movies.Movie;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,15 +25,15 @@ import butterknife.ButterKnife;
 /**
  */
 public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecyclerViewAdapter.MovieViewHolder> {
-    private static final String PARAM_PATH_IMAGE_SIZE = "w185";
-    public static String IMG_BASE_URL = "http://image.tmdb.org/t/p/";
+
 
     private final List<Movie> movies;
     private final OnListFragmentInteractionListener mListener;
 
-    @Inject Uri imgUri;
+    @Inject @Named("ImgUri") Uri imgUri;
 
     public MyListRecyclerViewAdapter(List<Movie> items, OnListFragmentInteractionListener listener) {
+        App.getAppComponent().inject(this);
         movies = items;
         mListener = listener;
     }
@@ -50,8 +52,9 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
         holder.mContentView.setText(movies.get(position).getTitle());
 
         String imgPath = movies.get(position).getImg();
+        imgPath = imgUri.buildUpon().appendEncodedPath(imgPath).build().toString();
         Glide.with(holder.layoutView.getContext())
-                .load(providesURIImage(imgPath))
+                .load(imgPath)
                 .asBitmap()
                 .centerCrop()
                 .into(holder.imgMovie);
@@ -62,7 +65,7 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.movie);
+                    mListener.onItemClicked(holder.movie);
                 }
             }
         });
@@ -71,14 +74,6 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
     @Override
     public int getItemCount() {
         return movies.size();
-    }
-
-    Uri providesURIImage(String posterPath) {
-        return Uri.parse(IMG_BASE_URL)
-                .buildUpon()
-                .appendPath(PARAM_PATH_IMAGE_SIZE)
-                .appendEncodedPath(posterPath)
-                .build();
     }
 
     public class MovieViewHolder extends RecyclerView.ViewHolder {

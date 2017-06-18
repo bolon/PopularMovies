@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnLi
     }
 
     @Override
-    public void onListFragmentInteraction(Movie item) {
-        //stub
+    public void onItemClicked(Movie selectedMovie) {
+        startActivity(DetailsActivity.createIntent(this, selectedMovie));
     }
 }

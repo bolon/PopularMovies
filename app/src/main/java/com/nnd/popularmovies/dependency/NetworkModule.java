@@ -4,8 +4,8 @@ import android.net.Uri;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.nnd.popularmovies.BuildConfig;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -21,9 +21,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
 public class NetworkModule {
+    private static final String PARAM_PATH_IMAGE_SIZE = "w185";
+    private static String IMG_BASE_URL = "http://image.tmdb.org/t/p/";
     private static String API_VERSION = "3";
     public static String API_BASE_URL = "https://api.themoviedb.org/" + API_VERSION + "/";
-
 
     public NetworkModule() {
     }
@@ -51,5 +52,11 @@ public class NetworkModule {
     @Provides
     MovieDbAPI providesMovieAPI(Retrofit retrofit) {
         return retrofit.create(MovieDbAPI.class);
+    }
+
+    @Provides
+    @Named("ImgUri")
+    Uri providesURIImage() {
+        return Uri.parse(IMG_BASE_URL).buildUpon().appendPath(PARAM_PATH_IMAGE_SIZE).build();
     }
 }

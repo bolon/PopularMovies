@@ -2,16 +2,18 @@ package com.nnd.popularmovies.main.movies;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.parceler.Parcel;
+
 /**
  * Created by Android dev on 6/17/17.
  */
-
+@Parcel
 public class Movie {
     @SerializedName("id") int id;
     @SerializedName("poster_path") String img;
     @SerializedName("vote_average") float voteAverage;
     @SerializedName("original_title") String originalTitle;
-    @SerializedName("released_date") String releasedDate;
+    @SerializedName("release_date") String releasedDate;
     @SerializedName("overview") String synopsis;
 
     String title;
