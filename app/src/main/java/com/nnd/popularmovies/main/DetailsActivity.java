@@ -16,6 +16,8 @@ import com.nnd.popularmovies.main.movies.Movie;
 
 import org.parceler.Parcels;
 
+import java.io.File;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -63,9 +65,18 @@ public class DetailsActivity extends AppCompatActivity {
         Glide.with(this).load(buildImgPath()).asBitmap().asIs().into(imgMovie);
         textTitle.setText(currentMovie.getTitle());
         textSynopsis.setText(currentMovie.getSynopsis());
-        Timber.i(currentMovie.getReleasedDate() + " released date");
-        textReleasedYear.setText(currentMovie.getReleasedDate());
-        textRating.setText(String.valueOf(currentMovie.getPopularity()));
+        textReleasedYear.setText(formatDate(currentMovie.getReleasedDate()));
+        textRating.setText(formatRating(currentMovie.getVoteAverage()));
+    }
+
+    private String formatDate(String date) {
+        String[] splittedString = date.split("-");
+        return splittedString[0];
+    }
+
+    private String formatRating(float rating) {
+        String formattedRating = String.valueOf(rating + File.separator + getString(R.string.vote_scale));
+        return formattedRating;
     }
 
     String buildImgPath() {
