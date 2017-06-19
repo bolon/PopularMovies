@@ -3,9 +3,10 @@ package com.nnd.popularmovies.main;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
 
 import com.nnd.popularmovies.App;
 import com.nnd.popularmovies.R;
@@ -24,9 +25,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity implements ListFragment.OnListFragmentInteractionListener, ConnectionCheckListener {
+    private static final String FRAGMENT_LIST_TAG = "fragment_list";
     @Inject MovieDbAPI movieDbAPI;
     @BindView(R.id.container) FrameLayout f;
-    @BindView(R.id.progress_bar_main) ProgressBar progressBar;
     @BindView(R.id.layout_retry) View layoutRetry;
 
     @Override
@@ -38,6 +39,31 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnLi
         ButterKnife.bind(this);
 
         checkConnection();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        ListFragment f = (ListFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_LIST_TAG);
+
+        if (f == null) return true;
+
+        switch (item.getItemId()) {
+            case R.id.action_sort_popularity: {
+                f.sortBy(true);
+                break;
+            }
+            case R.id.action_sort_rating: {
+                f.sortBy(false);
+                break;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -53,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnLi
             @Override
             protected void onPreExecute() {
                 layoutRetry.setVisibility(View.INVISIBLE);
-                progressBar.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -72,8 +97,6 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnLi
 
             @Override
             protected void onPostExecute(Boolean isConnect) {
-                progressBar.setVisibility(View.INVISIBLE);
-
                 if (isConnect) onSuccessConnect();
                 else onFailConnect();
             }
@@ -84,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnLi
     public void onSuccessConnect() {
         layoutRetry.setVisibility(View.INVISIBLE);
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.container, ListFragment.newInstance(2), "test")
+                .add(R.id.container, ListFragment.newInstance(2), FRAGMENT_LIST_TAG)
                 .commit();
     }
 

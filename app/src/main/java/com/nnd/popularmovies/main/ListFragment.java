@@ -2,6 +2,7 @@ package com.nnd.popularmovies.main;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,6 +10,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.nnd.popularmovies.App;
 import com.nnd.popularmovies.BuildConfig;
@@ -36,8 +39,32 @@ public class ListFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
     @Inject MovieDbAPI movieDbAPI;
     @BindView(R.id.list) RecyclerView recyclerView;
+    @BindView(R.id.progress_bar) ProgressBar progressBar;
     private int mColumnCount = 2;
+    private boolean isPopularMoviesShown = true;
     private OnListFragmentInteractionListener mListener;
+    private Callback<ResponseMovieAPI> callBack = new Callback<ResponseMovieAPI>() {
+        @Override
+        public void onResponse(Call<ResponseMovieAPI> call, Response<ResponseMovieAPI> response) {
+            try {
+                Timber.i("Fetch success... " + response.body().getMovieList().size());
+
+                recyclerView.setAdapter(new MyListRecyclerViewAdapter(response.body()
+                                                                              .getMovieList(), mListener));
+            } catch (NullPointerException ex) {
+                progressBar.setVisibility(View.INVISIBLE);
+                Timber.i(call.request().url().toString());
+            }
+            progressBar.setVisibility(View.INVISIBLE);
+        }
+
+        @Override
+        public void onFailure(Call<ResponseMovieAPI> call, Throwable t) {
+            Timber.e("Fetch failed... " + t.getMessage());
+            progressBar.setVisibility(View.INVISIBLE);
+            Toast.makeText(getActivity(), "Please check your connection", Toast.LENGTH_LONG).show();
+        }
+    };
 
     public ListFragment() {
     }
@@ -73,7 +100,8 @@ public class ListFragment extends Fragment {
         } else {
             recyclerView.setLayoutManager(new GridLayoutManager(recyclerView.getContext(), mColumnCount));
         }
-        fetchData();
+
+        if (recyclerView.getAdapter() == null) fetchData(true);
         return view;
     }
 
@@ -93,26 +121,35 @@ public class ListFragment extends Fragment {
         mListener = null;
     }
 
-    private void fetchData() {
-        Timber.i("enter here...");
-        movieDbAPI.fetchPopularMovie(BuildConfig.API_KEY_MOVDB, 1)
-                .enqueue(new Callback<ResponseMovieAPI>() {
-                    @Override
-                    public void onResponse(Call<ResponseMovieAPI> call, Response<ResponseMovieAPI> response) {
-                        try {
-                            Timber.i("Fetch success... " + response.body().getMovieList().size());
-                            recyclerView.setAdapter(new MyListRecyclerViewAdapter(response.body()
-                                                                                          .getMovieList(), mListener));
-                        } catch (NullPointerException ex) {
-                            Timber.i(call.request().url().toString());
-                        }
-                    }
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("isPopularShown", isPopularMoviesShown);
+    }
 
-                    @Override
-                    public void onFailure(Call<ResponseMovieAPI> call, Throwable t) {
-                        Timber.e("Fetch failed... " + t.getMessage());
-                    }
-                });
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            fetchData(savedInstanceState.getBoolean("isPopularShown", true));
+        }
+    }
+
+    private void fetchData(boolean isByPopularity) {
+        isPopularMoviesShown = isByPopularity;
+        recyclerView.setAdapter(null);
+        progressBar.setVisibility(View.VISIBLE);
+
+        if (isByPopularity)
+            movieDbAPI.fetchPopularMovie(BuildConfig.API_KEY_MOVDB, 1).enqueue(callBack);
+        else movieDbAPI.fetchTopMovie(BuildConfig.API_KEY_MOVDB, 1).enqueue(callBack);
+
+    }
+
+    public void sortBy(boolean isByPopularity) {
+        if (isByPopularity == isPopularMoviesShown) return;
+
+        fetchData(isByPopularity);
     }
 
     public interface OnListFragmentInteractionListener {

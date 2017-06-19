@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.nnd.popularmovies.App;
@@ -48,8 +47,6 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
     @Override
     public void onBindViewHolder(final MovieViewHolder holder, int position) {
         holder.movie = movies.get(position);
-        holder.mIdView.setText(String.valueOf(movies.get(position).getId()));
-        holder.mContentView.setText(movies.get(position).getTitle());
 
         String imgPath = movies.get(position).getImg();
         imgPath = imgUri.buildUpon().appendEncodedPath(imgPath).build().toString();
@@ -57,6 +54,7 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
                 .load(imgPath)
                 .asBitmap()
                 .centerCrop()
+                .asIs()
                 .into(holder.imgMovie);
 
         holder.layoutView.setOnClickListener(new View.OnClickListener() {
@@ -79,18 +77,11 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
     public class MovieViewHolder extends RecyclerView.ViewHolder {
         public Movie movie;
         @BindView(R.id.container_item) View layoutView;
-        @BindView(R.id.id) TextView mIdView;
         @BindView(R.id.poster) ImageView imgMovie;
-        @BindView(R.id.content) TextView mContentView;
 
         public MovieViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
         }
     }
 }
