@@ -62,7 +62,7 @@ public class ListFragment extends Fragment {
         public void onFailure(Call<ResponseMovieAPI> call, Throwable t) {
             Timber.e("Fetch failed... " + t.getMessage());
             progressBar.setVisibility(View.INVISIBLE);
-            Toast.makeText(getActivity(), "Please check your connection", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.toast_text_check_con, Toast.LENGTH_LONG).show();
         }
     };
 

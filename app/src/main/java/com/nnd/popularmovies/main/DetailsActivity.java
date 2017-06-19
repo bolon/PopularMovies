@@ -9,10 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.nnd.popularmovies.App;
 import com.nnd.popularmovies.R;
 import com.nnd.popularmovies.main.movies.Movie;
+import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcels;
 
@@ -23,7 +23,6 @@ import javax.inject.Named;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import timber.log.Timber;
 
 public class DetailsActivity extends AppCompatActivity {
     private static String KEY_EXTRA_MOVIE = "key_movie";
@@ -62,7 +61,7 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     private void setData() {
-        Glide.with(this).load(buildImgPath()).asBitmap().asIs().into(imgMovie);
+        Picasso.with(this).load(buildImgPath()).placeholder(R.mipmap.ic_placeholder).into(imgMovie);
         textTitle.setText(currentMovie.getTitle());
         textSynopsis.setText(currentMovie.getSynopsis());
         textReleasedYear.setText(formatDate(currentMovie.getReleasedDate()));

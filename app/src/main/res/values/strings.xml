@@ -3,4 +3,5 @@
     <string name="vote_scale">10</string>
     <string name="connection_ack">Please enable your connection and try again</string>
     <string name="connection_retry">RETRY</string>
+    <string name="toast_text_check_con">Please check your connection</string>
 </resources>
