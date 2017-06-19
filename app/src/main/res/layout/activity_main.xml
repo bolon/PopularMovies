@@ -11,5 +11,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <include
+            android:id="@+id/layout_retry"
+            layout="@layout/layout_fail_connect"
+            android:visibility="invisible"/>
+
+        <ProgressBar
+            android:id="@+id/progress_bar_main"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_gravity="center"/>
+
     </FrameLayout>
 </android.support.design.widget.CoordinatorLayout>
