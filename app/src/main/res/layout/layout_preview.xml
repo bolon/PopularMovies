@@ -13,12 +13,12 @@
         android:id="@+id/img_movie_poster"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="50"
+        android:layout_weight="35"
         />
 
 
     <RelativeLayout
-        android:layout_weight="50"
+        android:layout_weight="65"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="24dp"

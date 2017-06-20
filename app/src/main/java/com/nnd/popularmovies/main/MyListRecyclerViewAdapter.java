@@ -61,7 +61,7 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
                 .load(imgPath)
                 .resize(imgWidth, imgHeight)
                 .centerCrop()
-                .placeholder(R.mipmap.ic_placeholder)
+                .noPlaceholder()
                 .into(holder.imgMovie);
 
         holder.layoutView.setOnClickListener(new View.OnClickListener() {

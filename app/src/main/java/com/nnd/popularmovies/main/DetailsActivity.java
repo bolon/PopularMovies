@@ -61,7 +61,12 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     private void setData() {
-        Picasso.with(this).load(buildImgPath()).placeholder(R.mipmap.ic_placeholder).into(imgMovie);
+        Picasso.with(this)
+                .load(buildImgPath())
+                .fit()
+                .centerInside()
+                .placeholder(R.mipmap.placeholder)
+                .into(imgMovie);
         textTitle.setText(currentMovie.getTitle());
         textSynopsis.setText(currentMovie.getSynopsis());
         textReleasedYear.setText(formatDate(currentMovie.getReleasedDate()));
