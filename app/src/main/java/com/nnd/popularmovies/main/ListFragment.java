@@ -2,7 +2,7 @@ package com.nnd.popularmovies.main;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,24 +10,22 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.nnd.popularmovies.App;
-import com.nnd.popularmovies.BuildConfig;
 import com.nnd.popularmovies.R;
 import com.nnd.popularmovies.dependency.MovieDbAPI;
 import com.nnd.popularmovies.main.movies.Movie;
-import com.nnd.popularmovies.main.movies.ResponseMovieAPI;
+
+import org.parceler.Parcels;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import timber.log.Timber;
 
 /**
  * A fragment representing a list of Items.
@@ -37,42 +35,23 @@ import timber.log.Timber;
  */
 public class ListFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String ARG_DATA = "movie-data";
     @Inject MovieDbAPI movieDbAPI;
     @BindView(R.id.list) RecyclerView recyclerView;
-    @BindView(R.id.progress_bar) ProgressBar progressBar;
     private int mColumnCount = 2;
-    private boolean isPopularMoviesShown = true;
+    private List<Movie> movieList = new ArrayList<>();
     private OnListFragmentInteractionListener mListener;
-    private Callback<ResponseMovieAPI> callBack = new Callback<ResponseMovieAPI>() {
-        @Override
-        public void onResponse(Call<ResponseMovieAPI> call, Response<ResponseMovieAPI> response) {
-            try {
-                Timber.i("Fetch success... " + response.body().getMovieList().size());
-
-                recyclerView.setAdapter(new MyListRecyclerViewAdapter(response.body()
-                                                                              .getMovieList(), mListener));
-            } catch (NullPointerException ex) {
-                progressBar.setVisibility(View.INVISIBLE);
-                Timber.i(call.request().url().toString());
-            }
-            progressBar.setVisibility(View.INVISIBLE);
-        }
-
-        @Override
-        public void onFailure(Call<ResponseMovieAPI> call, Throwable t) {
-            Timber.e("Fetch failed... " + t.getMessage());
-            progressBar.setVisibility(View.INVISIBLE);
-            Toast.makeText(getActivity(), R.string.toast_text_check_con, Toast.LENGTH_LONG).show();
-        }
-    };
+    private MyListRecyclerViewAdapter adapter;
 
     public ListFragment() {
     }
 
-    public static ListFragment newInstance(int columnCount) {
+    public static ListFragment newInstance(int columnCount, List<Movie> data) {
         ListFragment fragment = new ListFragment();
+        Parcelable p = Parcels.wrap(data);
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putParcelable(ARG_DATA, p);
         fragment.setArguments(args);
         return fragment;
     }
@@ -85,6 +64,8 @@ public class ListFragment extends Fragment {
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            Parcelable p = getArguments().getParcelable(ARG_DATA);
+            movieList = Parcels.unwrap(p);
         }
     }
 
@@ -101,7 +82,11 @@ public class ListFragment extends Fragment {
             recyclerView.setLayoutManager(new GridLayoutManager(recyclerView.getContext(), mColumnCount));
         }
 
-        if (recyclerView.getAdapter() == null) fetchData(true);
+        if (!movieList.isEmpty()) {
+            adapter = new MyListRecyclerViewAdapter(movieList, mListener);
+        } else adapter = new MyListRecyclerViewAdapter(Collections.<Movie>emptyList(), mListener);
+
+        recyclerView.setAdapter(adapter);
         return view;
     }
 
@@ -123,33 +108,12 @@ public class ListFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        outState.putInt("data_2", 3);
         super.onSaveInstanceState(outState);
-        outState.putBoolean("isPopularShown", isPopularMoviesShown);
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            fetchData(savedInstanceState.getBoolean("isPopularShown", true));
-        }
-    }
-
-    private void fetchData(boolean isByPopularity) {
-        isPopularMoviesShown = isByPopularity;
-        recyclerView.setAdapter(null);
-        progressBar.setVisibility(View.VISIBLE);
-
-        if (isByPopularity)
-            movieDbAPI.fetchPopularMovie(BuildConfig.API_KEY_MOVDB, 1).enqueue(callBack);
-        else movieDbAPI.fetchTopMovie(BuildConfig.API_KEY_MOVDB, 1).enqueue(callBack);
-
-    }
-
-    public void sortBy(boolean isByPopularity) {
-        if (isByPopularity == isPopularMoviesShown) return;
-
-        fetchData(isByPopularity);
+    void insertItem(List<Movie> movie) {
+        adapter.replaceData(movie);
     }
 
     public interface OnListFragmentInteractionListener {

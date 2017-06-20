@@ -14,6 +14,7 @@ import com.nnd.popularmovies.main.ListFragment.OnListFragmentInteractionListener
 import com.nnd.popularmovies.main.movies.Movie;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -34,7 +35,8 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
 
     public MyListRecyclerViewAdapter(List<Movie> items, OnListFragmentInteractionListener listener) {
         App.getAppComponent().inject(this);
-        movies = items;
+        movies = new ArrayList<>();
+        movies.addAll(items);
         mListener = listener;
     }
 
@@ -77,6 +79,12 @@ public class MyListRecyclerViewAdapter extends RecyclerView.Adapter<MyListRecycl
     @Override
     public int getItemCount() {
         return movies.size();
+    }
+
+    public void replaceData(List<Movie> movieList) {
+        movies.clear();
+        movies.addAll(movieList);
+        notifyDataSetChanged();
     }
 
     public class MovieViewHolder extends RecyclerView.ViewHolder {
