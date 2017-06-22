@@ -14,12 +14,11 @@ android:
   - 'android-sdk-license.*'
 
 before_install:
-  - chmod -R +x script/
   - script/accept_constraintlayout_license.sh
-  - script/provide_test_apikey.sh
 
 before_script:
-  - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a
-  - emulator -avd test -no-skin -no-audio -no-window &
-  - android-wait-for-emulator
-  - adb shell input keyevent 82
+  - chmod -R +x script/
+  - script/provide_test_apikey.sh
+  - script/emulator_setup.sh
+
+
