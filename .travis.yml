@@ -14,11 +14,11 @@ android:
   - 'android-sdk-license.*'
 
 before_install:
+  - chmod -R +x script/
+  - script/provide_test_apikey.sh
   - script/accept_constraintlayout_license.sh
 
 before_script:
-  - chmod -R +x script/
-  - script/provide_test_apikey.sh
   - script/emulator_setup.sh
 
 

@@ -1,4 +1,4 @@
-KEY_PROPERTIES=$HOME"/key.properties"
+KEY_PROPERTIES=$TRAVIS_BUILD_DIR"/PopularMovies/key.properties"
 
 export KEY_PROPERTIES
 echo "Key Properties should exist at $KEY_PROPERTIES"
