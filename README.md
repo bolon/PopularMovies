@@ -1,4 +1,6 @@
 # PopularMovies
+[![Build Status](https://travis-ci.org/bolon/PopularMovies.svg?branch=master)](https://travis-ci.org/bolon/PopularMovies)
+
 Project for Udacity-Android Nanodegree Program
 
 API for PopularMovies can be found [here](https://developers.themoviedb.org/)
